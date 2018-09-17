@@ -38,15 +38,14 @@ def cleanWords(words):
 	return words
 
 
-
-words = cleanWords(getTweetsInDateRange("9/10/2018  5:53:11 PM","9/12/2018  5:53:11 PM"))
-topWords = nltk.FreqDist(words)
-
-for word, frequency in topWords.most_common(50):
-    print(u'{};{}'.format(word, frequency))
-
+def getTopWordsInRange(date1, date2):
+	words = cleanWords(getTweetsInDateRange(date1, date2))
+	topWords = nltk.FreqDist(words)
+	for word, frequency in topWords.most_common(50):
+   		print(u'{};{}'.format(word, frequency))
 
 
+getTopWordsInRange("9/10/2018  5:53:11 PM","9/12/2018  5:53:11 PM")
 
 	
 
