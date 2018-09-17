@@ -19,6 +19,7 @@ with open('tweets.csv') as csv_file:
     #print(f'Processed {line_count} lines.')
 
 print(words)
+words = [word for word in words if len(word) > 1]
 #topWords = FreqDist()
 
 
