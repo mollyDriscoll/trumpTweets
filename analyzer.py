@@ -13,14 +13,20 @@ with open('tweets.csv') as csv_file:
     for row in csv_reader:
     	i = 0
     	for r in row:
-    		print(r)
+    		#print(r)
     		if i == 0:
     			words.extend(nltk.word_tokenize(r))
     #print(f'Processed {line_count} lines.')
 
-print(words)
 words = [word for word in words if len(word) > 1]
-#topWords = FreqDist()
+words = [word for word in words if not word.isnumeric()]
+words = [word.lower() for word in words]
+print(words)
+
+topWords = nltk.FreqDist(words)
+
+for word, frequency in topWords.most_common(50):
+    print(u'{};{}'.format(word, frequency))
 
 
 
