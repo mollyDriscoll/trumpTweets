@@ -3,10 +3,12 @@ import nltk
 nltk.download('punkt')
 from nltk.corpus import stopwords
 import datetime
+#dont forget -- pipenv install py-dateutil
 from dateutil import parser
 #nltk.download('stopwords')
 
-#top words, given time period
+
+
 
 def getTweetsInDateRange(date1, date2):
 	words = [[]]
@@ -24,23 +26,20 @@ def getTweetsInDateRange(date1, date2):
 			i = i + 1
 	return words
 
+def cleanWords(words):
+	customStopwords = ['https', 'http']
+	stopWords = stopwords.words('english')
+	stopWords.extend(customStopwords)
 
-#make list of words
-#read in from csv file
-words = getTweetsInDateRange("9/10/2018  5:53:11 PM","9/12/2018  5:53:11 PM")
-
-#cleaning data
-customStopwords = ['https', 'http']
-stopWords = stopwords.words('english')
-stopWords.extend(customStopwords)
+	words = [word for word in words if len(word) > 1]
+	words = [word for word in words if not word.isnumeric()]
+	words = [word.lower() for word in words]
+	words = [word for word in words if not word in stopWords]
+	return words
 
 
 
-words = [word for word in words if len(word) > 1]
-words = [word for word in words if not word.isnumeric()]
-words = [word.lower() for word in words]
-words = [word for word in words if not word in stopWords]
-
+words = cleanWords(getTweetsInDateRange("9/10/2018  5:53:11 PM","9/12/2018  5:53:11 PM"))
 topWords = nltk.FreqDist(words)
 
 for word, frequency in topWords.most_common(50):
