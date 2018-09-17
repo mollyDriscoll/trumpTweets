@@ -45,6 +45,8 @@ def getTopWordsInRange(date1, date2):
    		print(u'{};{}'.format(word, frequency))
 
 
+def test():
+	return 5
 getTopWordsInRange("9/10/2018  5:53:11 PM","9/12/2018  5:53:11 PM")
 
 	
@@ -53,8 +55,9 @@ getTopWordsInRange("9/10/2018  5:53:11 PM","9/12/2018  5:53:11 PM")
 #we have the tweets, what now?
 #set up website?
 #analyze
-	#top words in a given time period?
+	#top words in a given time period!
 	#top topics
+	#top phrases
 	#nicknames
 	#emotion
 	#capitilization
