@@ -7,13 +7,13 @@ from twitter_scraper import get_tweets
 tweets = [[]]
 for tweet in get_tweets('realDonaldTrump', pages=1):
     #print(tweet['text'], tweet['time'])
-    row = [tweet['text'], tweet[time]]
+    row = [tweet['text'], tweet['time']]
     tweets.append(row)
 
 
 
-
-with open('person.csv', 'w') as csvFile:
+#write info to the csv file
+with open('tweets.csv', 'w') as csvFile:
     writer = csv.writer(csvFile)
     writer.writerows(tweets)
 
