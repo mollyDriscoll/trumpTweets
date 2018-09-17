@@ -9,6 +9,7 @@ markovify = "*"
 twitter-scraper = "*"
 "beautifulsoup4" = "*"
 nltk = "*"
+py-dateutil = "*"
 
 [dev-packages]
 twine = "*"
