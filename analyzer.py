@@ -27,7 +27,7 @@ def getTweetsInDateRange(date1, date2):
 			i = i + 1
 	return words
 
-#this function returns a list of list where each list contains a list of all the words in a given tweet
+#Get tokenized tweet word but separated by tweet
 def getSeperatedTweetsInDateRange(date1, date2):
 	tweets = [[]]  #so the structure is [tweet, tweet, tweet], where each tweet is a list of words
 	lowerDate = parser.parse(date1)
@@ -45,7 +45,8 @@ def getSeperatedTweetsInDateRange(date1, date2):
 	return tweets
 
 #to clean our words up
-def cleanWords(words, extraSymbols, excludeStopWords):
+# remove empty spaces, numbers, stopwords, and extrasymbols (if we want to, and makes all lowercase)
+def cleanWords(words, extraSymbols, excludeStopWords, makeAllLowerCase):
 	customStopwords = ['https', 'http']
 	customStopwords.extend(extraSymbols)
 	stopWords = stopwords.words('english')
@@ -53,14 +54,15 @@ def cleanWords(words, extraSymbols, excludeStopWords):
 
 	words = [word for word in words if len(word) > 1]
 	words = [word for word in words if not word.isnumeric()]
-	words = [word.lower() for word in words]
+	if makeAllLowerCase:
+		words = [word.lower() for word in words]
 	if excludeStopWords:
 		words = [word for word in words if not word in stopWords]
-
 	#remove punctuation at the end?
 	#this removes all words with a symbol in extraSymbols
-	keepWords = []
+	
 	if len(extraSymbols) > 0:
+		keepWords = []
 		for word in words:
 			hasABadSymbol = False
 			for c in word:
@@ -70,15 +72,14 @@ def cleanWords(words, extraSymbols, excludeStopWords):
 					break
 			if not hasABadSymbol:
 				keepWords.append(word)
-	words = keepWords
-					
+		keepWords = []
 	return words
 
-#this returns the top words in a date range
-def getTopWordsInRange(date1, date2):
-	words = cleanWords(getTweetsInDateRange(date1, date2), [], True)
+#this returns the X top words in a date range
+def getXTopWordsInRange(date1, date2, x):
+	words = cleanWords(getTweetsInDateRange(date1, date2), [], True, True)
 	topWords = nltk.FreqDist(words)
-	for word, frequency in topWords.most_common(50):
+	for word, frequency in topWords.most_common(x):
    		print(u'{};{}'.format(word, frequency))
 
 
@@ -102,11 +103,11 @@ def findngrams(inputList, n):
 				hasANonStopWord = True
 		if hasANonStopWord == True:
 			newgrams.append(ngram)
-			
+
 	return newgrams
 
 #this gets our top 
-def getTopNgrams(date1, date2, n):
+def getXTopNgrams(date1, date2, x,  n):
 	extraSymbols = ['/', "'", '.', '`', '-']
 	#get the tweets
 	tweets = getSeperatedTweetsInDateRange(date1, date2)
@@ -114,7 +115,7 @@ def getTopNgrams(date1, date2, n):
 
 	#clean each tweet
 	for tweets in tweets:
-		newTweets.append(cleanWords(tweets, extraSymbols, False))
+		newTweets.append(cleanWords(tweets, extraSymbols, False, True))
 	tweets = newTweets
 	
 	#make the ngrams
@@ -123,26 +124,105 @@ def getTopNgrams(date1, date2, n):
 		ngrams = findngrams(tweet, n)
 		phrases.extend(ngrams)
 
-	#get and print the most common
+	#get and return the most common
 	topPhrases = nltk.FreqDist(phrases)
-	for word, frequency in topPhrases.most_common(50):
-   		print(u'{};{}'.format(word, frequency))
+	ret = []
+	for word, frequency in topPhrases.most_common(x):
+   		ret.append(u'{};{}'.format(word, frequency))
+
+	return ret
+
+#lets get the top uppercase phrases
+def getXTopUppercaseNgrams(date1, date2, x,  n):
+	extraSymbols = ['/', "'", '.', '`', '-']
+	#get the tweets
+	tweets = getSeperatedTweetsInDateRange(date1, date2)
+	newTweets = [[]]
+
+	#clean each tweet
+	for tweets in tweets:
+		newTweets.append(cleanWords(tweets, extraSymbols, False, False))
+	tweets = newTweets
+	
+	#make the ngrams
+	phrases = []
+	for tweet in tweets:
+		ngrams = findngrams(tweet, n)
+		phrases.extend(ngrams)
+
+	#eliminate non uppercase phrases
+	uppercasePhrases = []
+	for phrase in phrases:
+		isTitle = True
+		for word in phrase:
+			isTitle = isTitle and word[0].isupper()
+		if isTitle:
+			uppercasePhrases.append(phrase)
+
+	#find teh topphrases
+	topPhrases = nltk.FreqDist(uppercasePhrases)
+	ret = []
+	for word, frequency in topPhrases.most_common(x):
+   		ret.append(u'{};{}'.format(word, frequency))
+
+	return ret
+
+
+#returns a tuple, (capitals not at the start of a sentence, capitals at the start)
+def getCapitals(date1, date2):
+	tweets = getSeperatedTweetsInDateRange(date1, date2)
+	sentenceEnders = [",", ".", "?", "!"]
+	#get capitals, ignoring first of sentence
+	capitals = ([],[])
+	for tweet in tweets:
+		previousWasEndOfSentence = True
+		for word in tweet:
+			if word[0].isupper():
+				if previousWasEndOfSentence:
+					capitals[1].append(word)
+				else:
+					capitals[0].append(word)
+			if word[len(word) -1].endswith("."):
+				previousWasEndOfSentence = True
+			else:
+				previousWasEndOfSentence = False
+	capitals = ((cleanWords(capitals[0], [], True, True)), (cleanWords(capitals[1], [], True, True)))
+	return capitals
+
+#get the most popular capital words
+#need to clean things that should be capitalized, as in countries, names, I, The
+def getNTopCapitals(date1, date2, n):
+	capitals = getCapitals(date1, date2)
+	topRandomCapitals = nltk.FreqDist(capitals[0])
+	topFirstCapitals = nltk.FreqDist(capitals[1])
+	for word, frequency in topRandomCapitals.most_common(n):
+		if word in capitals[1]:
+			frequency = frequency + topFirstCapitals.get(word)
+		print(u'{};{}'.format(word, frequency))
+
 
 
 def test():
 	#return 5
-	#return getTopWordsInRange("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM")
-	return getTopNgrams("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 2)
-
+	#return getXTopWordsInRange("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM")
+	print(getXTopNgrams("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 15, 2))
+	#getNTopCapitals("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 30)
+	print(getXTopUppercaseNgrams("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 15, 2))
 
 test()
 
+
+#todo:
+#have things return not print
+#have top capitals count if its at the fron of a word
+#link words to the tweets they come from
+#make some texts please molly
 
 #we have the tweets, what now?
 #set up website?
 #analyze
 	#top words in a given time period!
-	#top phrases
+	#top phrases!
 	#top topics
 	#nicknames
 	#emotion
