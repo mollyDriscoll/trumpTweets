@@ -46,7 +46,8 @@ def getTopWordsInRange(date1, date2):
 
 
 def test():
-	return getTopWordsInRange("9/10/2018  5:53:11 PM","9/12/2018  5:53:11 PM")
+	return 5
+	#return getTopWordsInRange("9/10/2018  5:53:11 PM","9/12/2018  5:53:11 PM")
 
 	
 
