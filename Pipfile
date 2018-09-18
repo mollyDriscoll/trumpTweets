@@ -10,6 +10,7 @@ twitter-scraper = "*"
 "beautifulsoup4" = "*"
 nltk = "*"
 py-dateutil = "*"
+flask = "*"
 
 [dev-packages]
 twine = "*"
