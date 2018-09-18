@@ -28,7 +28,7 @@ def getTweetsInDateRange(date1, date2):
 	return words
 
 #Get tokenized tweet word but separated by tweet
-def getSeperatedTweetsInDateRange(date1, date2):
+def getSeparatedTweetsInDateRange(date1, date2):
 	tweets = [[]]  #so the structure is [tweet, tweet, tweet], where each tweet is a list of words
 	lowerDate = parser.parse(date1)
 	upperDate = parser.parse(date2)
@@ -76,11 +76,13 @@ def cleanWords(words, extraSymbols, excludeStopWords, makeAllLowerCase):
 	return words
 
 #this returns the X top words in a date range
-def getXTopWordsInRange(date1, date2, x):
+def getXTopWords(date1, date2, x):
 	words = cleanWords(getTweetsInDateRange(date1, date2), [], True, True)
 	topWords = nltk.FreqDist(words)
+	retWords = []
 	for word, frequency in topWords.most_common(x):
-   		print(u'{};{}'.format(word, frequency))
+   		retWords.append((word, frequency))
+	return retWords
 
 
 #http://locallyoptimal.com/blog/2013/01/20/elegant-n-gram-generation-in-python/
@@ -108,9 +110,9 @@ def findngrams(inputList, n):
 
 #this gets our top 
 def getXTopNgrams(date1, date2, x,  n):
-	extraSymbols = ['/', "'", '.', '`', '-']
+	extraSymbols = ['/', "'", '.', '`', '-', "\\"]
 	#get the tweets
-	tweets = getSeperatedTweetsInDateRange(date1, date2)
+	tweets = getSeparatedTweetsInDateRange(date1, date2)
 	newTweets = [[]]
 
 	#clean each tweet
@@ -127,8 +129,8 @@ def getXTopNgrams(date1, date2, x,  n):
 	#get and return the most common
 	topPhrases = nltk.FreqDist(phrases)
 	ret = []
-	for word, frequency in topPhrases.most_common(x):
-   		ret.append(u'{};{}'.format(word, frequency))
+	for phrase, frequency in topPhrases.most_common(x):
+   		ret.append((phrase, frequency))
 
 	return ret
 
@@ -136,7 +138,7 @@ def getXTopNgrams(date1, date2, x,  n):
 def getXTopUppercaseNgrams(date1, date2, x,  n):
 	extraSymbols = ['/', "'", '.', '`', '-']
 	#get the tweets
-	tweets = getSeperatedTweetsInDateRange(date1, date2)
+	tweets = getSeparatedTweetsInDateRange(date1, date2)
 	newTweets = [[]]
 
 	#clean each tweet
@@ -163,14 +165,14 @@ def getXTopUppercaseNgrams(date1, date2, x,  n):
 	topPhrases = nltk.FreqDist(uppercasePhrases)
 	ret = []
 	for word, frequency in topPhrases.most_common(x):
-   		ret.append(u'{};{}'.format(word, frequency))
+   		ret.append((word, frequency))
 
 	return ret
 
 
 #returns a tuple, (capitals not at the start of a sentence, capitals at the start)
 def getCapitals(date1, date2):
-	tweets = getSeperatedTweetsInDateRange(date1, date2)
+	tweets = getSeparatedTweetsInDateRange(date1, date2)
 	sentenceEnders = [",", ".", "?", "!"]
 	#get capitals, ignoring first of sentence
 	capitals = ([],[])
@@ -186,30 +188,32 @@ def getCapitals(date1, date2):
 				previousWasEndOfSentence = True
 			else:
 				previousWasEndOfSentence = False
-	capitals = ((cleanWords(capitals[0], [], True, True)), (cleanWords(capitals[1], [], True, True)))
+	capitals = ((cleanWords(capitals[0], [], True, False)), (cleanWords(capitals[1], [], True, False)))
 	return capitals
 
 #get the most popular capital words
 #need to clean things that should be capitalized, as in countries, names, I, The
-def getNTopCapitals(date1, date2, n):
+def getXTopCapitals(date1, date2, x):
 	capitals = getCapitals(date1, date2)
 	topRandomCapitals = nltk.FreqDist(capitals[0])
 	topFirstCapitals = nltk.FreqDist(capitals[1])
-	for word, frequency in topRandomCapitals.most_common(n):
+	retValue = []
+	for word, frequency in topRandomCapitals.most_common(x):
 		if word in capitals[1]:
 			frequency = frequency + topFirstCapitals.get(word)
-		print(u'{};{}'.format(word, frequency))
+		retValue.append((word, frequency))
+	return retValue
 
 
 
 def test():
-	#return 5
-	#return getXTopWordsInRange("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM")
-	print(getXTopNgrams("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 15, 2))
-	#getNTopCapitals("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 30)
-	print(getXTopUppercaseNgrams("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 15, 2))
+	return 5
+	#return getXTopWords("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM")
+	#print(getXTopNgrams("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 15, 2))
+	#getXTopCapitals("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 30)
+	#print(getXTopUppercaseNgrams("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 15, 2))
 
-test()
+#test()
 
 
 #todo:
@@ -217,6 +221,8 @@ test()
 #have top capitals count if its at the fron of a word
 #link words to the tweets they come from
 #make some texts please molly
+#from getXTopNgrams get rid of backslashes
+#dealing wiht hashtags
 
 #we have the tweets, what now?
 #set up website?
