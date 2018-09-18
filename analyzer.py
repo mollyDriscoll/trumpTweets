@@ -207,20 +207,16 @@ def getXTopCapitals(date1, date2, x):
 
 
 def test():
-	return 5
 	#return getXTopWords("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM")
-	#print(getXTopNgrams("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 15, 2))
+	print(getXTopNgrams("9/12/2018  5:53:11 AM","9/13/2018  5:53:11 PM", 15, 3))
 	#getXTopCapitals("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 30)
 	#print(getXTopUppercaseNgrams("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 15, 2))
 
-#test()
+test()
 
 
 #todo:
-#have things return not print
-#have top capitals count if its at the fron of a word
 #link words to the tweets they come from
-#make some texts please molly
 #from getXTopNgrams get rid of backslashes
 #dealing wiht hashtags
 
