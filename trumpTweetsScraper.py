@@ -7,7 +7,7 @@ from twitter_scraper import get_tweets
 tweets = [[]]
 for tweet in get_tweets('realDonaldTrump', pages=25):
     #print(tweet['text'], tweet['time'])
-    row = [tweet['text'], tweet['time']]
+    row = [tweet['text'], tweet['time'], tweet['likes']]
     tweets.append(row)
 
 

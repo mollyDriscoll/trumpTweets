@@ -7,6 +7,7 @@ import datetime
 #dont forget -- pipenv install py-dateutil
 from dateutil import parser
 from itertools import chain
+import re
 #nltk.download('stopwords')
 
 
@@ -27,7 +28,25 @@ def getTweetsInDateRange(date1, date2):
 			i = i + 1
 	return words
 
+
+
 #Get tokenized tweet word but separated by tweet
+def getSeparatedTweetsInDateRange2(date1, date2):
+	tweets = [[]]  #so the structure is [tweet, tweet, tweet], where each tweet is a list of words
+	lowerDate = parser.parse(date1)
+	upperDate = parser.parse(date2)
+	with open('tweets.csv') as csv_file:
+		csv_reader = csv.reader(csv_file, delimiter = ',')
+		i = 0
+		for row in csv_reader:
+			if( i != 0):
+				date = parser.parse(row[1])
+				if (lowerDate < date) and (date < upperDate) and len(row[0]) > 0:
+					text = row[0]
+					tweets.append(nltk.word_tokenize(text))
+			i = i + 1
+	return tweets
+
 def getSeparatedTweetsInDateRange(date1, date2):
 	tweets = [[]]  #so the structure is [tweet, tweet, tweet], where each tweet is a list of words
 	lowerDate = parser.parse(date1)
@@ -60,6 +79,8 @@ def cleanWords(words, extraSymbols, excludeStopWords, makeAllLowerCase):
 		words = [word for word in words if not word in stopWords]
 	#remove punctuation at the end?
 	#this removes all words with a symbol in extraSymbols
+
+
 	
 	if len(extraSymbols) > 0:
 		keepWords = []
@@ -206,11 +227,34 @@ def getXTopCapitals(date1, date2, x):
 
 
 
+
+#make sure not a retweet
+def XMostLikedTweets(date1, date2, x):
+	lowerDate = parser.parse(date1)
+	upperDate = parser.parse(date2)
+	tweetsAndLikes = []
+	with open('tweets.csv') as csv_file:
+		csv_reader = csv.reader(csv_file, delimiter = ',')
+		i = 0
+		for row in csv_reader:
+			if( i != 0):
+				date = parser.parse(row[1])
+				if (lowerDate < date) and (date < upperDate) and len(row[0]) > 0:
+					entry = (row[2], row[0])
+					tweetsAndLikes.extend(entry)
+			i = i + 1
+	print(tweetsAndLikes[0][0])
+	tweetsAndLikes = sorted(tweetsAndLikes, key=lambda tup: tup[0])
+	print(tweetsAndLikes[1][0])
+	return tweetsAndLikes[0:x]
+
+
 def test():
-	#return getXTopWords("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM")
-	print(getXTopNgrams("9/12/2018  5:53:11 AM","9/13/2018  5:53:11 PM", 15, 3))
-	#getXTopCapitals("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 30)
+	#print(getXTopWords("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM"))
+	# print(getXTopNgrams("9/12/2018  5:53:11 AM","9/13/2018  5:53:11 PM", 5, 3))
+	#print(getXTopCapitals("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 30))
 	#print(getXTopUppercaseNgrams("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 15, 2))
+	XMostLikedTweets("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 1)
 
 test()
 
@@ -219,6 +263,7 @@ test()
 #link words to the tweets they come from
 #from getXTopNgrams get rid of backslashes
 #dealing wiht hashtags
+#deal with contractions
 
 #we have the tweets, what now?
 #set up website?
@@ -231,3 +276,4 @@ test()
 	#capitilization
 	#tweet popularity
 		#popular in which groups
+	#write tweets on a certain subject
