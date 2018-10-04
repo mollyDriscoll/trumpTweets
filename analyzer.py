@@ -248,15 +248,17 @@ def XMostLikedTweets(date1, date2, x):
 	print(tweetsAndLikes[1][0])
 	return tweetsAndLikes[0:x]
 
-
-def test():
+# def test():
 	#print(getXTopWords("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM"))
 	# print(getXTopNgrams("9/12/2018  5:53:11 AM","9/13/2018  5:53:11 PM", 5, 3))
 	#print(getXTopCapitals("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 30))
 	#print(getXTopUppercaseNgrams("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 15, 2))
-	XMostLikedTweets("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 1)
+	#XMostLikedTweets("9/12/2018  5:53:11 AM","9/18/2018  11:53:11 PM", 1)
+	#print(getXTopWords("10/3/2018  5:53:11 AM","/2018  11:53:11 PM", 2))
 
-test()
+
+
+# test()
 
 
 #todo:
@@ -271,9 +273,13 @@ test()
 	#top words in a given time period!
 	#top phrases!
 	#top topics
+	#find frequency of word
 	#nicknames
 	#emotion
 	#capitilization
 	#tweet popularity
 		#popular in which groups
 	#write tweets on a certain subject
+	#filter out retweets
+	#filter by containing a word
+	
