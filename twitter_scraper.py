@@ -5,7 +5,7 @@ from datetime import datetime
 session = HTMLSession()
 
 
-def get_tweets(user, pages=25):
+def get_tweets(user, pages=5):
     """Gets tweets for a given user, via the Twitter frontend API."""
 
     url = f'https://twitter.com/i/profiles/show/{user}/timeline/tweets?include_available_features=1&include_entities=1&include_new_items_bar=true'
